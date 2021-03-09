@@ -4,26 +4,20 @@ const router = express.Router();
 const User = require("../models/userSchema")
 
 
-router.post("/user", (req, res) => {
+router.post("/user", async (req, res) => {
     try {
         if (!req.body) {
-            res.status(400)
-            console.log("Ошибка 400");
+            await res.status(400)
+            await res.send("в теле post ошибка");
         }
         const {firstName, lastName, email} = req.body;
-        const user = new User({firstName, lastName, email})
-        console.log(user);
-        user.save((err) => {
-            if (err) {
-                res.status(500).json("ай бля все полетело")
-                console.log(err);
-            }
-            mongoose.disconnect().then(() => {
-                console.log('отключились от бд')
+        const user =  new User({firstName, lastName, email})
+        await user.save((err) => {
+            if (err) res.status(500).json("ай бля все полетело")
+            mongoose.disconnect().then(() => res.status(200).send("Все ок, сохранилось"))
             });
-        })
     } catch (e) {
-        res.status(401)
+        res.status(400).send("еще какая-то ошибка")
 
     }
 });
